@@ -10,9 +10,9 @@ namespace WindowsFormsApp1
     {
         public static Dictionary<String, String> decoder = new Dictionary<string, string>
         {
-            { "Кот", "AorticValveMaxVelocity" },
-            { "Собака", "tbAorticValveMaxGradient" },
-            { "Сова", "tbAorticValveAvarageVelocity" }
+            { "кот", "AorticValveMaxVelocity" },
+            { "собака", "tbAorticValveMaxGradient" },
+            { "сова", "tbAorticValveAvarageVelocity" }
         };
     }
 }
