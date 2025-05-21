@@ -29,10 +29,14 @@ namespace WindowsFormsApp1
             
             string modelPath = @"config\models\vosk-model-mod-ru-0.22";
 
+            //       Dictionary<String,String> modelHash = ModelSecurity.GenerateHashes(modelPath+ "\\graph");
+
+            ModelSecurity.VerifyHashes(modelPath);
             recognizer = new Recognizer(modelPath, false, true);
             recognizer.RecognitionResultReceived += Recognizer_RecognitionResultReceived;
 
             recognizer.setCodeDictionary(ReadJsonToDictionary(@"config\vocabulary.json"));
+            stopButton.Enabled = false;
         }
 
         void Recognizer_RecognitionResultReceived(object sender, string result)
@@ -41,9 +45,12 @@ namespace WindowsFormsApp1
 
             if (data.Length >= 2)
             {
-                for (int i = 0; i < data.Length - 1; i++)
+                if (IsNumber(data[data.Length - 1]))
                 {
-                    SetTextBoxValue(FindControlRecursive(this, data[i]), data[data.Length - 1]);
+                    for (int i = 0; i < data.Length - 1; i++)
+                    {
+                        SetTextBoxValue(FindControlRecursive(this, data[i]), data[data.Length - 1]);
+                    }
                 }
             }
                 
@@ -83,7 +90,6 @@ namespace WindowsFormsApp1
         {
             if (control == null)
                 Console.WriteLine("trouble with control Incorect Name!");
-               // throw new ArgumentNullException(nameof(control));
 
             if (control is TextBox textBox)
             {
@@ -132,10 +138,22 @@ namespace WindowsFormsApp1
             return null;
         }
 
+        public static bool IsNumber(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return false;
+
+            double number;
+            return double.TryParse(input, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out number);
+        }
+
+
 
         private void startButton_Click(object sender, EventArgs e)
         {
             recognizer.startRecording();
+            startButton.Enabled = false;
+            stopButton.Enabled = true;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -153,6 +171,8 @@ namespace WindowsFormsApp1
         private void stopButton_Click_1(object sender, EventArgs e)
         {
             recognizer.stopRecording();
+            startButton.Enabled = true;
+            stopButton.Enabled = false;
         }
 
     }

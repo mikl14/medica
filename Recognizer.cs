@@ -97,9 +97,6 @@ namespace SpeechRecognision
 
         private void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
         {
-            recognizer?.Dispose();
-            model?.Dispose();
-            waveIn?.Dispose();
         }
 
         public void stopRecording()
