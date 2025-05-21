@@ -1,62 +1,89 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using SpeechRecognision;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Vosk;
-using NAudio.Wave;
-using System.Text.RegularExpressions;
+
+
 
 namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-   
 
-        private WaveInEvent waveIn;
-        private VoskRecognizer recognizer;
-        private Model model;
-
-        public static List<Control> selectedListControl = new List<Control>();
+     //   public static List<Control> selectedListControl = new List<Control>();
         public static Dictionary<String, String> decoder;
+        Recognizer recognizer;
         public Form1()
         {
             InitializeComponent();
+            
+            string modelPath = @"config\models\vosk-model-mod-ru-0.22";
 
-            string modelPath = @"models\vosk-model-mod-ru-0.22";
-            model = new Model(modelPath);
+            recognizer = new Recognizer(modelPath, false, true);
+            recognizer.RecognitionResultReceived += Recognizer_RecognitionResultReceived;
 
-            // Создаём распознаватель с частотой 16000 Гц
-            recognizer = new VoskRecognizer(model, 16000.0f);
+            recognizer.setCodeDictionary(ReadJsonToDictionary(@"config\vocabulary.json"));
+        }
 
-            // Настраиваем захват с микрофона
-            waveIn = new WaveInEvent();
-            waveIn.DeviceNumber = 0; // номер микрофона, если несколько - можно выбирать
-            waveIn.WaveFormat = new WaveFormat(16000, 1); // 16 kHz, моно
-            waveIn.DataAvailable += WaveIn_DataAvailable;
-            waveIn.RecordingStopped += WaveIn_RecordingStopped;
-            waveIn.RecordingStopped += WaveIn_RecordingStopped;
+        void Recognizer_RecognitionResultReceived(object sender, string result)
+        {
+            var data = result.Split('|', ' ');
 
+            if (data.Length >= 2)
+            {
+                for (int i = 0; i < data.Length - 1; i++)
+                {
+                    SetTextBoxValue(FindControlRecursive(this, data[i]), data[data.Length - 1]);
+                }
+            }
+                
+
+         
+            Console.WriteLine(result);
         }
 
         private void ucEchocardioscopy1_Load(object sender, EventArgs e)
         {
-            selectedListControl = GetControlsInGroupBox(this, "gbAorticValve");
-            selectedListControl.RemoveAll(c => !(c is TextBox));
+           // selectedListControl = GetControlsInGroupBox(this, "gbAorticValve");
+       //     selectedListControl.RemoveAll(c => !(c is TextBox));
 
-            Console.WriteLine(selectedListControl.Count);
+         //   Console.WriteLine(selectedListControl.Count);
+        }
+
+        public static Dictionary<string, string> ReadJsonToDictionary(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("File not found", filePath);
+            }
+
+            string jsonContent = File.ReadAllText(filePath);
+            var originalDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonContent);
+
+            var lowerDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kvp in originalDict)
+            {
+                lowerDict[kvp.Key.ToLower()] = kvp.Value;
+            }
+
+            return lowerDict;
         }
 
         public void SetTextBoxValue(Control control, string value)
         {
             if (control == null)
-                throw new ArgumentNullException(nameof(control));
+                Console.WriteLine("trouble with control Incorect Name!");
+               // throw new ArgumentNullException(nameof(control));
 
             if (control is TextBox textBox)
             {
@@ -73,7 +100,8 @@ namespace WindowsFormsApp1
             {
                 // Можно добавить логирование или обработку случая,
                 // когда переданный контрол не является TextBox
-                throw new ArgumentException("Control is not a TextBox", nameof(control));
+                Console.WriteLine("Control is not a TextBox");
+            //    throw new ArgumentException("Control is not a TextBox", nameof(control));
             }
         }
 
@@ -104,78 +132,15 @@ namespace WindowsFormsApp1
             return null;
         }
 
-        private void WaveIn_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            // Передаём аудио данные в распознаватель
-            if (recognizer.AcceptWaveform(e.Buffer, e.BytesRecorded))
-            {
-                var result = RemoveSpecialCharactersExceptSpaces(recognizer.Result());
-
-
-                String[] splitResult = result.Split(new char[] { ' ' });
-                if(splitResult.Length > 1)
-                {
-                    if (Decoder.decoder.ContainsKey(splitResult[0]))
-                    {
-                        Decoder.decoder.TryGetValue(splitResult[0], out string value);
-
-                        double ss = RussianNumberParcer.Parse(splitResult[1]);
-
-                        if (selectedListControl.Any(c => value.Equals(c.Tag)))
-                        {
-                            Control control = selectedListControl.Find(c => c.Tag.Equals(value));
-
-                            SetTextBoxValue(control, ss.ToString());
-                        }
-                    }
-                }
-
-            
-               // AppendText(result);
-            }
-            else
-            {
-                var partial = recognizer.PartialResult();
-                //AppendText(partial, partialResult: true);
-            }
-        }
-
-        private void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
-        {
-            recognizer?.Dispose();
-            model?.Dispose();
-            waveIn?.Dispose();
-        }
-
-
-
-        public static string RemoveSpecialCharactersExceptSpaces(string input)
-        {
-            if (input == null)
-                return null;
-
-            // Удаляем все символы, кроме букв (латиница и кириллица), цифр и пробелов
-            // Также удаляем символы переноса строки \r и \n
-            string pattern = @"[^a-zA-Zа-яА-Я0-9 ]"; // пробел оставляем, переносы строки убираем
-            string result = Regex.Replace(input, pattern, "");
-            result = result.Replace("text", "");
-            result = result.Trim();
-            return result;
-        }
 
         private void startButton_Click(object sender, EventArgs e)
         {
-         //   textBoxResults.Clear();
-           // toolStripStatusLabel.Text = "Начинаем запись...";
-            waveIn.StartRecording();
+            recognizer.startRecording();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            waveIn?.StopRecording();
-            waveIn?.Dispose();
-            recognizer?.Dispose();
-            model?.Dispose();
+            recognizer.stopRecording();
             base.OnFormClosing(e);
         }
 
@@ -187,7 +152,7 @@ namespace WindowsFormsApp1
 
         private void stopButton_Click_1(object sender, EventArgs e)
         {
-            waveIn.StopRecording();
+            recognizer.stopRecording();
         }
 
     }

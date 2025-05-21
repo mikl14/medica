@@ -35,21 +35,21 @@
             // 
             // startButton
             // 
-            this.startButton.Location = new System.Drawing.Point(947, 1344);
+            this.startButton.Location = new System.Drawing.Point(324, 1116);
             this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(75, 23);
+            this.startButton.Size = new System.Drawing.Size(194, 23);
             this.startButton.TabIndex = 1;
-            this.startButton.Text = "button1";
+            this.startButton.Text = "Старт записи";
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
             // stopButton
             // 
-            this.stopButton.Location = new System.Drawing.Point(947, 1384);
+            this.stopButton.Location = new System.Drawing.Point(564, 1116);
             this.stopButton.Name = "stopButton";
-            this.stopButton.Size = new System.Drawing.Size(75, 23);
+            this.stopButton.Size = new System.Drawing.Size(179, 23);
             this.stopButton.TabIndex = 2;
-            this.stopButton.Text = "stopButton";
+            this.stopButton.Text = "Конец записи";
             this.stopButton.UseVisualStyleBackColor = true;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click_1);
             // 
