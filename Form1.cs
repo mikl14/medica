@@ -35,6 +35,8 @@ namespace WindowsFormsApp1
             recognizer = new Recognizer(modelPath, false, true);
             recognizer.RecognitionResultReceived += Recognizer_RecognitionResultReceived;
 
+            micBox.Items.AddRange(Recognizer.getDevices().ToArray());
+
             recognizer.setCodeDictionary(ReadJsonToDictionary(@"config\vocabulary.json"));
             stopButton.Enabled = false;
         }
@@ -148,6 +150,24 @@ namespace WindowsFormsApp1
         }
 
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            recognizer.stopRecording();
+            base.OnFormClosing(e);
+        }
+
+
+        private void stopButton_Click(object sender, EventArgs e)
+        {
+            recognizer.stopRecording();
+            startButton.Enabled = true;
+            stopButton.Enabled = false;
+        }
+
+        private void micBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Recognizer.setDeviceNumber(micBox.SelectedIndex);
+        }
 
         private void startButton_Click(object sender, EventArgs e)
         {
@@ -156,23 +176,9 @@ namespace WindowsFormsApp1
             stopButton.Enabled = true;
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        private void micBox_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            recognizer.stopRecording();
-            base.OnFormClosing(e);
-        }
 
-        private void stopButton_Click(object sender, EventArgs e)
-        {
-       
-          //  toolStripStatusLabel.Text = "Остановлено";
-        }
-
-        private void stopButton_Click_1(object sender, EventArgs e)
-        {
-            recognizer.stopRecording();
-            startButton.Enabled = true;
-            stopButton.Enabled = false;
         }
 
     }
