@@ -38,7 +38,7 @@
             // 
             this.micBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.micBox.FormattingEnabled = true;
-            this.micBox.Location = new System.Drawing.Point(1104, 403);
+            this.micBox.Location = new System.Drawing.Point(1094, 403);
             this.micBox.Name = "micBox";
             this.micBox.Size = new System.Drawing.Size(121, 24);
             this.micBox.TabIndex = 8;
@@ -47,7 +47,7 @@
             // stopButton
             // 
             this.stopButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.stopButton.Location = new System.Drawing.Point(1194, 471);
+            this.stopButton.Location = new System.Drawing.Point(1184, 471);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(179, 23);
             this.stopButton.TabIndex = 7;
@@ -58,7 +58,7 @@
             // startButton
             // 
             this.startButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.startButton.Location = new System.Drawing.Point(980, 471);
+            this.startButton.Location = new System.Drawing.Point(970, 471);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(194, 23);
             this.startButton.TabIndex = 6;

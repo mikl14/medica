@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Vosk;
+using NLog;
+
 
 
 
@@ -23,21 +25,34 @@ namespace WindowsFormsApp1
      //   public static List<Control> selectedListControl = new List<Control>();
         public static Dictionary<String, String> decoder;
         Recognizer recognizer;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public Form1()
         {
             InitializeComponent();
-            
-            string modelPath = @"config\models\vosk-model-mod-ru-0.22";
+
+            logger.Info($"Запуск приложения: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+
+            string modelPath = @"config\models\vosk-model-small-ru-0.22";
 
             //       Dictionary<String,String> modelHash = ModelSecurity.GenerateHashes(modelPath+ "\\graph");
 
-            ModelSecurity.VerifyHashes(modelPath);
+            try
+            {
+                ModelSecurity.VerifyHashes(modelPath);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Ошибка верификации модели: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                this.Close();
+            }
             recognizer = new Recognizer(modelPath, false, true);
             recognizer.RecognitionResultReceived += Recognizer_RecognitionResultReceived;
 
             micBox.Items.AddRange(Recognizer.getDevices().ToArray());
 
             recognizer.setCodeDictionary(ReadJsonToDictionary(@"config\vocabulary.json"));
+
             stopButton.Enabled = false;
         }
 

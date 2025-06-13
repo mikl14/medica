@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 
 public class ModelSecurity
 {
@@ -63,6 +64,7 @@ public class ModelSecurity
 
                 if (!string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase))
                 {
+                    MessageBox.Show("Модель не соотвествует заданной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     throw new InvalidOperationException(
                         $"Хеш файла '{relativePath}' не совпадает с эталоном. Ожидалось: {expectedHash}, получено: {actualHash}");
                 }
