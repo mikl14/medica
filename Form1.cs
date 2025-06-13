@@ -33,7 +33,7 @@ namespace WindowsFormsApp1
 
             logger.Info($"Запуск приложения: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
-            string modelPath = @"config\models\vosk-model-small-ru-0.22";
+            string modelPath = @"config\models\vosk-model-mod-ru-0.22";
 
             //       Dictionary<String,String> modelHash = ModelSecurity.GenerateHashes(modelPath+ "\\graph");
 
